@@ -25,7 +25,6 @@ console.log('baz.a', baz.a); // 3
 
 
 
-
 // !IMPORTANT! переопределить контектс после bind не удастся
 function foo(something) {
   console.log(this.name)
