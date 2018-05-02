@@ -10,7 +10,7 @@
 
 function foo(contxt) {
   this.self = contxt
-  console.log(self.name);
+  console.log(self && self.name);
 }
 
 var mark = {
@@ -24,8 +24,8 @@ var mark = {
   }
 }
 
-mark.sayWrong(foo)
-mark.say()
+mark.sayWrong(foo); // undefined and undefined
+mark.say(); // 'mark'
 
 
 
