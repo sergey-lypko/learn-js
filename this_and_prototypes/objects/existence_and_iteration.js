@@ -63,9 +63,6 @@ for (var key in myO) {
 // непредсказуемому поведению
 
 
-
-
-
 // Дополнительные способы проверки и
 // получения значений полей объеков
 var myOb = {};
@@ -99,9 +96,136 @@ Object.getOwnPropertyNames(myOb); // ['a', 'b']
 
 // NOTE:
 // на данный момент нет способа проверить/получить
-// все свойства на всех вложенных уровнях всех объектов
-// и их цепочек прототиво
+// все свойства (enumerable или нет) на всех вложенных
+// уровнях всех объектов и их цепочек прототипов
 // TODO:
 // данный механизм можно реализовать с помощью
 // рекурсивного обхода полей объекта с дальнейшим
 // получением списка полей с помощью Object.keys
+
+
+
+
+// Iteration
+var ob = {
+  a: 1,
+  b: 2,
+  c: 3
+}
+
+// for in перебирает ключи объектов
+// так же включая цепочку [[Prototype]]
+// NOTE: порядок перебора может сильно отличаться
+// в зависимости от используемого движка
+for (key in ob) {
+  console.log(key);
+}
+
+
+// Итераторы – расширяющая понятие «массив» концепция
+// Итераторы (итерируемые объекты) - те, содержимое которых можно перебрать в цикле
+
+// для прямой итерации значений (а не индексов или ключей)
+// используется for of
+
+// for of общается с объектом-итератором (@@iterator)
+// этот итератор указывает какие значения могут использоваться
+// для итерации с помщью вызова метода итератора next()
+
+// у массивов есть свой встроенный @@iterator так что
+// for of отлично подходит для итерации по ним
+for (var el of [1, 2, 3, 4]) {
+
+}
+
+
+// мануальный проход по массиву, используя встроенный итератор
+// for of выполняет подобные процедуры у себя под капотом
+var myArr = [2, 10, 23, 12];
+
+// Symbol - служит для создания уникальных идентификаторов, неизменяем
+var myIt = myArr[Symbol.iterator]();
+
+console.log(myIt.next());
+console.log(myIt.next());
+console.log(myIt.next());
+
+
+// в то время как у массивов имеется встроенный итератор,
+// у обычных объектов - нет
+var ob = {
+  a: 1,
+  b: 2
+}
+
+// будет выброшена ошибка ob[Symbol.iterator] is not a function -
+// у данного объекта нет итератора
+for (var v of ob) {
+  console.log(v);
+}
+
+// создадим собственный итератор
+Object.defineProperty(ob, Symbol.iterator, {
+  // объявляя кастомный итератор, мы создаем свойство-утилиту,
+  // которые не должно быть видимо при обычно переборе свойств объекта
+  enumerable: false,
+
+  writable: false,
+  configurable: true,
+
+  value: function() {
+    var self = this;
+    var index = 0;
+    var ks = Object.keys(this);
+
+    return {
+      next: function() {
+        console.log(index)
+
+        return {
+          value: self[ks[index++]],
+          done: (index > ks.length)
+        };
+      }
+    };
+  }
+});
+
+// после того как итератор для объекта объявляен, его можно
+// итерировать с помощью for of
+for (var v of ob) {
+  console.log(v);
+}
+
+// соответственно то же самое можно сделать вручную
+var myIter = ob[Symbol.iterator]();
+myIter.next(); // { value:2, done:false }
+myIter.next(); // { value:3, done:false }
+myIter.next(); // { value:undefined, done:true }
+
+
+// имеется возможность создавать итераторы любого рода
+// и кастомизировать их под свои нужды
+var randoms = {
+  [Symbol.iterator]: function() {
+    return {
+      next: function() {
+        return {
+          value: Math.random()
+        }
+      }
+    }
+  }
+};
+
+var randomPool = [];
+
+for (var n of randoms) {
+  randomPool.push(n);
+
+  if (randomPool.length === 100) {
+    break;
+  }
+}
+
+console.log('randomPool', randomPool);

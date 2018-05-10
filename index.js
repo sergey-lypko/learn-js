@@ -1,29 +1,25 @@
-// Дополнительные способы проверки и
-// получения значений полей объекта
-var myOb = {};
+// имеется возможность создавать итераторы любого рода
+// и кастомизировать их под свои нужды
+var randoms = {
+  [Symbol.iterator]: function() {
+    return {
+      next: function() {
+        return {
+          value: Math.random()
+        }
+      }
+    }
+  }
+};
 
-Object.defineProperty(myOb, 'a', {
-  value: 1,
-  enumerable: true
-});
+var randomPool = [];
 
-Object.defineProperty(myOb, 'b', {
-  value: 2,
-  enumerable: false
-});
+for (var n of randoms) {
+  randomPool.push(n);
 
-myOb.propertyIsEnumerable('a'); // true
-myOb.propertyIsEnumerable('b'); // false
+  if (randomPool.length === 100) {
+    break;
+  }
+}
 
-
-// Object.keys и Object.getOwnPropertyNames -
-// оба идут только по базовым объектам, без
-// дальнейшего движения вверх по цепочке прототипов
-
-// Object.keys возвращает все enumerable
-// свойства объекта
-Object.keys(myOb); // ['a']
-
-// Object.getOwnPropertyNames возвращает все свойства,
-// enumerable или нет
-Object.getOwnPropertyNames(myOb); // ['a', 'b']
+console.log('randomPool', randomPool);
