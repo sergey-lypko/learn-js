@@ -19,29 +19,33 @@ var Vehicle = {
   engines: 1,
 
   ignition: function() {
-    console.log('Turning on my engine');
+    console.log('Turning on my engines', this.engines);
   },
 
   drive: function() {
     this.ignition();
-    console.log('Vehicle: driving right now');
   }
 }
 
-var Car = explicitMixin(Vehicle, {
-  wheels: 4,
+var SpeedBot = explicitMixin(Vehicle, {
+  engines: 2,
 
   drive: function() {
 
-    // необходимо выполнить drive -> ignition() именно для Car
-    // по этому используется explicit binding, чтобы
-    // убедиться, что drive будет использовать контекст Car
-
     // explicit pseudopolymorphism
+    // так как оба объекта Vehicle и Car имеют метод с одинаковым именем - drive,
+    // чтобы различить вызов на тот или иной, необходима абсолютная (не относительная) ссылка 
+    // поэтому мы явно указывам имя объекта Vehicle и вызов метода от него
+    
+    // но если бы указали просто Vehicle.drive(), использовался бы контекст Vehicle
+    // в связи с этим явное указание контекста - exsplicit binding
     Vehicle.drive.call(this);
-
-    console.log('Car: driving right now');
+    
+    // таким образом метод drive переопределен, но сохраняет ссылку на радительский метод
+    // с необходимым поведением - в данном случае это this.ignition();
+    // в то же время можно отлично дополнить переопределенный метод любым другим поведением
+    console.log('Making some another stuff here');
   }
 });
 
-Car.drive()
+SpeedBot.drive(); // Turning on my engines, 2
