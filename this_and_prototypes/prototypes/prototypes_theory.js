@@ -50,7 +50,7 @@ var secondObject = new Foo();
 // но при вызове ее вместе с new происходит вызов конструктора, а в результате - новый объект,
 // который получает [[Prototype]]-ссылку
 function NothingSpecial() {
-  console.log('Do not mind me);
+  console.log('Do not mind me');
 }
               
 var a = new NothingSpecial();
@@ -60,3 +60,30 @@ a; // {}
   
 // Механика работы прототипов
 
+// как говорилось выше, любая функция связана с объектом "Foo dot prototype"
+function Foo(name) {
+  this.name = name;
+}
+
+// этот объект соответственно можно расширять различными свойствами
+Foo.prototype.showName = function () {
+  
+  // помним, что this динамичен
+  return this.name;
+}
+
+var mark = new Foo('Mark');
+var dan = new Foo('Dan');
+
+// объекты mark и dan не содержат в себе свойства (ссылки на функцию) showName
+// вместо этого, через алгоритм поиска [[Get]] (см. файл handling_properties.js) они  
+// отправляются вверх искать это свойство по цепочке прототипов
+
+// в данном случае тем "общим делегирующим" объектом для mark и dan как раз и будет
+// являться наш "Foo dot prototype"
+// это как раз то, что и делает new & constructor - устанавливает ссылку между mark, dan и т.д и "Foo dot prototype"
+
+// в итоге оба объекта находят свойство showName в цепочке прототипов и могут использовать его
+// вместе со своим контекстом
+mark.showName(); // 'Mark'
+dan.showName(); // Dan
