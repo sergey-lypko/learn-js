@@ -22,5 +22,5 @@ function Foo() {}
 var myNewObject = new Foo();
 
 // в данном контексте Foo.prototype - это объект, о котором идет речь выше - Foo dot prototype
-// но способ, ссылка, чтобы получить этот объект, выглядит так же*
+// но ссылка, которая на него указывает, к несчастью выглядит таким же образом*
 Object.getPrototypeOf(myNewObject) === Foo.prototype;
