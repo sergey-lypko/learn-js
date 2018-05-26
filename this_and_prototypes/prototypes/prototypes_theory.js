@@ -54,12 +54,14 @@ var secondObject = new Foo();
 
 
 // NothingSpecial - это обыкновенная функция
-// но при вызове ее вместе с new происходит вызов конструктора, а в результате - новый объект,
-// который получает [[Prototype]]-ссылку
+// но при вызове ее вместе с new происходит вызов конструктора
 function NothingSpecial() {
   console.log('Do not mind me');
 }
               
+// в результате - новый объект,
+// который получает [[Prototype]]-ссылку на "Foo dot prototype" своего конструктора
+// в данном случае NothingSpecial
 var a = new NothingSpecial();
 a; // {}
 
