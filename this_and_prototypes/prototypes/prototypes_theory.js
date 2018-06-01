@@ -135,7 +135,7 @@ awesome.constructor === Object; // true
 
 
 
-// базовая идеология
+// РЕЗЮМИРУЮЯ: базовая идеология
 
 // расмотрим пример
 function Person(name, age) {
