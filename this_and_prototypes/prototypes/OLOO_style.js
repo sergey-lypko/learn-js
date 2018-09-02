@@ -2,10 +2,13 @@
 
 // Альтернатива классическому конструкторно-прототипному подходу, которую предлагает Кайл.
 // Идея в том, чтобы фокусировать внимание на прототипной связи между объектами, использовать 
-// сильные стороны прототипов, но при этом избежать путаницы и возник с конструкторами.
+// сильные стороны прототипов, но при этом избежать путаницы и возни с конструкторами, а так же 
+// переопределениями/расширениями родительских классов - explicit pseudopolymorphism.
 // По итогу получается более простой, читабельный и не менее функциональный код.
 
 
+
+// * * * 
 // Традиционный подход:
 
 function Person(name){
@@ -38,18 +41,119 @@ var Person = {
   }
 };
 
-// Формируем прототипную связь между объектами
+// Формируем прототипную связь между объектами:
 var Worker = Object.create(Person);
 
-// Расширять дочерний класс очень просто
+// Расширять дочерний класс очень просто:
 Worker.speak = function() {
   return `Some message from: ${this.name}`;
 };
 
-// Создание экземпляров с помощью продолжения цепочки прототипов
+// Создание экземпляров с помощью продолжения цепочки прототипов:
 var mark = Object.create(Worker);
 mark.init('Mark');
 
 mark.showName(); // Mark
 
 
+
+// * * *
+// Сравнение возможных вариантов построения наследования (и связей между объектами)
+// стр. 126
+
+
+// Прототипы:
+
+function Vehicle(engineType, horsePower) {
+  this.engineType = engineType;
+  this.horsePower = horsePower;
+  
+  this.engineIsWorking = false; 
+}
+
+Vehicle.prototype.engineTurnOn = function() {
+  this.engineIsWorking = true;
+}
+
+function Car(engineType, horsePower, model) {
+  Vehicle.call(this, engineType, horsePower);
+  this.model = model;
+}
+
+Car.prototype = Object.create(Vehicle.prototype);
+
+// explicit pseudopolymorphism (ugliness) для расширения поведения родительского класса.
+Car.prototype.engineTurnOn = function() {
+  Vehicle.prototype.engineTurnOn.call(this);
+  console.log('Engine now working for Car', this.engineIsWorking);
+}
+
+var model3 = new Car('electro', 435, 'Model 3');
+model3.engineTurnOn(); // "Engine now working for Car", true
+
+
+// ES6 Классы:
+
+class Vehicle {
+  constructor(engineType, horsePower) {
+    this.engineType = engineType;
+    this.horsePower = horsePower;
+
+    this.engineIsWorking = false;
+  }
+
+  engineTurnOn() {
+    this.engineIsWorking = true;
+  }
+}
+
+class Car extends Vehicle {
+  constructor(engineType, horsePower, model) {
+    super(engineType, horsePower);
+
+    this.model = model;
+  }
+
+  engineTurnOn() {
+    Vehicle.prototype.engineTurnOn.call(this);
+    console.log(this.engineIsWorking);
+  }
+}
+
+const modelS = new Car('electro', 'Model S', 362);
+modelS.engineTurnOn();
+
+
+// OLOO (стр. 130)
+// Идея так же в том, чтобы отойти от традииционного ОО-подхода "родитель-наследник".
+// Vehicle - это своего рода набор базовых утилит, которые затем будут делегированы другим оббектам.
+
+const Vehicle = {
+  init(engineType, horsePower) {
+    this.engineType = engineType;
+    this.horsePower = horsePower;
+
+    this.engineIsWorking = false;
+  },
+  engineTurnOn() {
+    this.engineIsWorking = true;
+  }
+};
+
+// Прототивная связь между объектами:
+const Car = Object.create(Vehicle);
+
+Car.setup = function(engineType, horsePower, model) {
+  this.init(engineType, horsePower);
+  this.model = model;
+};
+
+Car.showSpec = function() {
+  console.log(this.engineType, this.horsePower, this.model);
+  console.log('Engine is working: ', this.engineIsWorking);
+};
+
+const modelX = Object.create(Car);
+modelX.setup('electro', 772, 'Model S');
+modelX.engineTurnOn();
+modelX.showSpec(); // electro 772 Model S . Engine is working:  true
