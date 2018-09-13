@@ -6,6 +6,9 @@
 // переопределениями/расширениями родительских классов - explicit pseudopolymorphism.
 // По итогу получается более простой, читабельный и не менее функциональный код.
 
+// Хорошая статья Eric Elliot связанная с этой темой
+// https://medium.com/javascript-scene/common-misconceptions-about-inheritance-in-javascript-d5d9bab29b0a
+
 
 
 // * * * 
