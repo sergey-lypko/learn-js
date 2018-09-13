@@ -191,12 +191,18 @@ let animal = {
 };
  
 let mouseFactory = function mouseFactory () {
+  let secret = 'secret agent';
+
   return Object.assign(Object.create(animal), {
     animalType: 'mouse',
     furColor: 'brown',
     legs: 4,
-    tail: 'long, skinny'
+    tail: 'long, skinny',
+    profession () {
+      return secret;
+    }
   });
 };
+ 
+let james = mouseFactory();
 
-let mickey = mouseFactory();
